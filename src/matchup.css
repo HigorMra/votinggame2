@@ -1,0 +1,27 @@
+/* Candidate matchup and user-provided election reference figures. */
+.match-info h1{font-size:clamp(30px,4.1vw,44px);letter-spacing:1.2px}
+.candidate-card{min-height:510px}
+.candidate-head{align-items:flex-start}
+.candidate-mark{flex:none;margin-top:3px}
+.candidate-label{min-width:0;flex:1}
+.candidate-select{display:block;width:100%;min-width:0;max-width:100%;margin:4px 0 5px;padding:4px 18px 4px 6px;border:1px solid #353b47;border-radius:4px;background:#12151c;color:#c8d0dc;font-size:7px;line-height:1.4;letter-spacing:.1px;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;outline:none}
+.candidate-select:focus{border-color:#657b9a;box-shadow:0 0 0 2px #5488cb22}
+.candidate-select option{background:#171a21;color:#e8ecf3}
+.candidate-label h2{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;line-height:1.08;min-height:1.08em}
+.candidate-office,.candidate-ballots{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#8992a1;font-size:7px;line-height:1.45}
+.candidate-ballots{margin-top:3px;color:#7d8796;font-family:'DM Mono',monospace;font-size:6px;letter-spacing:.2px}
+.side-share{flex:none;margin-left:4px}
+.score-row{margin-top:2px}
+.candidate-card .score-row .micro-label{color:#929baa}
+@media(max-width:700px){
+  .match-info h1{font-size:clamp(27px,7.2vw,35px);letter-spacing:.45px;line-height:1.05}
+  .candidate-card{min-height:500px}
+  .candidate-mark{display:none}
+  .candidate-head{gap:4px}
+  .candidate-label h2{font-size:13px;line-height:1.12;min-height:2.24em;letter-spacing:0}
+  .candidate-select{font-size:6px;padding:4px 13px 4px 5px;margin:3px 0 4px}
+  .candidate-office{font-size:5px}
+  .candidate-ballots{font-size:4.7px;letter-spacing:0}
+  .candidate-party{font-size:5px}
+  .side-share{margin-top:2px}
+}

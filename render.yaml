@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: voto-live-adapter
+    runtime: node
+    plan: free
+    buildCommand: npm ci --omit=dev
+    startCommand: npm run server
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TIKTOK_USERNAME
+        sync: false
