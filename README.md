@@ -1,4 +1,4 @@
-# Voto Live
+<!--# Voto Live
 
 Overlay interativo para TikTok LIVE. O placar só registra uma Rosa depois que a mesma pessoa comenta `ESQUERDA` ou `DIREITA` e envia o presente. Cliques na urna não contam votos.
 
@@ -23,4 +23,4 @@ Para rodar testes locais, execute `npm test` e `npm run build`. `server/gifts.js
 
 ## Adaptador hospedado antigo
 
-`server/index.js` e `render.yaml` permanecem como opção hospedada legada usando `tiktok-live-connector`. Os logs do Render mostraram que a assinatura de eventos dessa integração exige uma rota Business do Eulerstream. Para a alternativa sem esse provedor pago, use `npm run live:local` com TikFinity.
+`server/index.js` e `render.yaml` permanecem como opção hospedada legada usando `tiktok-live-connector`. Os logs do Render mostraram que a assinatura de eventos dessa integração exige uma rota Business do Eulerstream. Para a alternativa sem esse provedor pago, use `npm run live:local` com TikFinity.-->
