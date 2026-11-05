@@ -1,268 +1,127 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Activity, ArrowDownRight, ArrowRight, Clock3, Gift, Heart, Sparkles, Users } from 'lucide-react'
-import { connectLive } from './live.js'
-import { getVoteDelta } from './vote-math.js'
+import { useEffect, useMemo, useState } from 'react'
+import { ArrowLeft, ArrowRight, Check, CircleHelp, Cookie, Gift, Heart, Home, Mail, Menu, Minus, Plus, ShieldCheck, ShoppingBag, ShoppingCart, Sparkles, Star, Ticket, Truck, X } from 'lucide-react'
+import { products } from './products.js'
 
-const SIDE_META = {
-  left: { label: 'ESQUERDA', color: 'blue', initial: 'E' },
-  right: { label: 'DIREITA', color: 'red', initial: 'D' },
+const promos = [
+  { eyebrow: 'VANTAGENS FEITAS PARA VOCÊ', title: 'Seu próximo benefício começa aqui.', text: 'Explore ofertas de demonstração e monte sua seleção em poucos cliques.', cta: 'VER CUPONS', to: '/cupons', tone: 'promo-peach', icon: Gift },
+  { eyebrow: 'ESCOLHA COM CALMA', title: 'Uma vitrine de boas oportunidades.', text: 'Encontre um benefício que combine com o que você procura.', cta: 'EXPLORAR OFERTAS', to: '/cupons', tone: 'promo-blue', icon: Sparkles },
+  { eyebrow: 'RESGATE SIMPLES', title: 'Mais vantagens no seu ritmo.', text: 'Guarde seus cupons no carrinho e revise sua seleção quando quiser.', cta: 'ABRIR CARRINHO', to: '/carrinho', tone: 'promo-lilac', icon: Ticket },
+]
+const routeNames = { '/': 'Início', '/cupons': 'Cupons', '/carrinho': 'Carrinho', '/faq': 'Dúvidas', '/privacidade': 'Privacidade', '/cookies': 'Cookies', '/diretrizes': 'Diretrizes' }
+const CART_KEY = 'vitrine-demo-cart-v1'
+const CONSENT_KEY = 'vitrine-cookie-preferences-v1'
+const safeRead = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback } catch { return fallback } }
+const readCart = () => {
+  const value = safeRead(CART_KEY, [])
+  if (!Array.isArray(value)) return []
+  return value.filter((item) => item && products.some((product) => product.id === item.id) && Number.isInteger(item.quantity) && item.quantity > 0 && item.quantity <= 10)
+}
+const formatPoints = (value) => `${new Intl.NumberFormat('pt-BR').format(value)} pts`
+
+function navigate(to) {
+  window.history.pushState({}, '', to)
+  window.dispatchEvent(new PopStateEvent('popstate'))
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-const CANDIDATES = {
-  left: [
-    { id: 'erika-hilton', name: 'Erika Hilton', photo: '/candidates/erika-hilton.jpg', party: 'PSOL', office: 'Deputada federal / SP', votes: 1596472 },
-    { id: 'samia-bomfim', name: 'Sâmia Bomfim', photo: '/candidates/samia-bomfim.jpg', party: 'PSOL', office: 'Deputada federal / SP', votes: 583107 },
-    { id: 'ana-elisa', name: 'Ana Elisa', photo: '/candidates/ana-elisa.jpg', party: 'PT', office: 'Deputada federal / MG', votes: 524219 },
-    { id: 'tabata-amaral', name: 'Tabata Amaral', photo: '/candidates/tabata-amaral.jpg', party: 'PSB', office: 'Deputada federal / SP', votes: 476383 },
-    { id: 'fernanda-melchionna', name: 'Fernanda Melchionna', photo: '/candidates/fernanda-melchionna.jpg', party: 'PSOL', office: 'Deputada federal / RS', votes: 280262 },
-    { id: 'guilherme-cortez', name: 'Guilherme Cortez', photo: '/candidates/guilherme-cortez.jpg', party: 'PSOL', office: 'Deputado federal / SP', votes: 275450 },
-    { id: 'eduardo-suplicy', name: 'Eduardo Suplicy', photo: '/candidates/eduardo-suplicy.jpg', party: 'PT', office: 'Deputado estadual / SP', votes: 654627 },
-    { id: 'sofia-favero', name: 'Sofia Favero', photo: '/candidates/sofia-favero.jpg', party: 'PSOL', office: 'Deputada estadual / SP', votes: 407773 },
-    { id: 'carlos-giannazi', name: 'Carlos Giannazi', photo: '/candidates/carlos-giannazi.jpg', party: 'PSOL', office: 'Deputado estadual / SP', votes: 367861 },
-    { id: 'paula-bancada-feminista', name: 'Paula da Bancada Feminista', photo: '/candidates/paula-bancada-feminista.jpg', party: 'PSOL', office: 'Deputada estadual / SP', votes: 326190 },
-    { id: 'ediane-maria', name: 'Ediane Maria', photo: '/candidates/ediane-maria.jpg', party: 'PSOL', office: 'Deputada estadual / SP', votes: 170844 },
-    { id: 'luiza-erundina', name: 'Luiza Erundina', photo: '/candidates/luiza-erundina.jpg', party: 'PSOL', office: 'Deputada estadual / SP', votes: 169567 },
-    { id: 'duda-hidalgo', name: 'Duda Hidalgo', photo: '/candidates/duda-hidalgo.jpg', party: 'PT', office: 'Deputada estadual / SP', votes: 154953 },
-    { id: 'professora-bebel', name: 'Professora Bebel', photo: '/candidates/professora-bebel.jpg', party: 'PT', office: 'Deputada estadual / SP', votes: 142001 },
-    { id: 'mariana-conti', name: 'Mariana Conti', photo: '/candidates/mariana-conti.jpg', party: 'PSOL', office: 'Deputada estadual / SP', votes: 126344 },
-    { id: 'leonardo-grandini', name: 'Leonardo Grandini', photo: '/candidates/leonardo-grandini.jpg', party: 'PT', office: 'Deputado estadual / SP', votes: 122158 },
-    { id: 'emidio', name: 'Emídio', photo: '/candidates/emidio.jpg', party: 'PT', office: 'Deputado estadual / SP', votes: 108275 },
-    { id: 'rodrigo-mar', name: 'Rodrigo Mar', photo: '/candidates/rodrigo-mar.jpg', party: 'PT', office: 'Deputado estadual / SP', votes: 104820 },
-    { id: 'enio-tatto', name: 'Enio Tatto', photo: '/candidates/enio-tatto.jpg', party: 'PT', office: 'Deputado estadual / SP', votes: 102892 },
-    { id: 'paulo-fiorilo', name: 'Paulo Fiorilo', photo: '/candidates/paulo-fiorilo.jpg', party: 'PT', office: 'Deputado estadual / SP', votes: 96370 },
-    { id: 'luiz-fernando', name: 'Luiz Fernando', photo: '/candidates/luiz-fernando.jpg', party: 'PT', office: 'Deputado estadual / SP', votes: 94901 },
-    { id: 'debora-camilo', name: 'Débora Camilo', photo: '/candidates/debora-camilo.jpg', party: 'PSOL', office: 'Deputada estadual / SP', votes: 94895 },
-    { id: 'donato', name: 'Donato', photo: '/candidates/donato.jpg', party: 'PT', office: 'Deputado estadual / SP', votes: 94779 },
-    { id: 'ana-perugini', name: 'Ana Perugini', photo: '/candidates/ana-perugini.jpg', party: 'PT', office: 'Deputada estadual / SP', votes: 70737 },
-  ],
-  right: [
-    { id: 'nikolas-ferreira', name: 'Nikolas Ferreira', photo: '/candidates/nikolas-ferreira.jpg', party: 'PL', office: 'Deputado federal / MG', votes: 3119318 },
-    { id: 'lucas-pavanato', name: 'Lucas Pavanato', photo: '/candidates/lucas-pavanato.jpg', party: 'PL', office: 'Deputado federal / SP', votes: 3038438 },
-    { id: 'andre-fernandes', name: 'André Fernandes', photo: '/candidates/andre-fernandes.jpg', party: 'PL', office: 'Deputado federal / CE', votes: 684372 },
-    { id: 'julia-zanatta', name: 'Julia Zanatta', photo: '/candidates/julia-zanatta.jpg', party: 'PL', office: 'Deputada federal / SC', votes: 560223 },
-    { id: 'jeffrey-chiquini', name: 'Jeffrey Chiquini', photo: '/candidates/jeffrey-chiquini.jpg', party: 'Novo', office: 'Deputado federal / PR', votes: 425399 },
-    { id: 'lucas-polese', name: 'Lucas Polese', photo: '/candidates/lucas-polese.jpg', party: 'PL', office: 'Deputado federal / ES', votes: 419735 },
-    { id: 'delegado-caveira', name: 'Delegado Caveira', photo: '/candidates/delegado-caveira.jpg', party: 'PL', office: 'Deputado federal / PA', votes: 414927 },
-    { id: 'mauricio-marcon', name: 'Maurício Marcon', photo: '/candidates/mauricio-marcon.jpg', party: 'PL', office: 'Deputado federal / RS', votes: 379834 },
-    { id: 'renato-bolsonaro', name: 'Renato Bolsonaro', photo: '/candidates/renato-bolsonaro.jpg', party: 'PL', office: 'Deputado federal / SP', votes: 379312 },
-    { id: 'cabo-gilberto-silva', name: 'Cabo Gilberto Silva', photo: '/candidates/cabo-gilberto-silva.jpg', party: 'PL', office: 'Deputado federal / PB', votes: 267142 },
-    { id: 'eduarda-campopiano', name: 'Eduarda Campopiano', photo: '/candidates/eduarda-campopiano.jpg', party: 'PL', office: 'Deputada estadual / SP', votes: 1956238 },
-    { id: 'giovanni-sanches', name: 'Giovanni Sanches', photo: '/candidates/giovanni-sanches.jpg', party: 'PL', office: 'Deputado estadual / SP', votes: 235363 },
-    { id: 'tenente-coimbra', name: 'Tenente Coimbra', photo: '/candidates/tenente-coimbra.jpg', party: 'PL', office: 'Deputado estadual / SP', votes: 198342 },
-    { id: 'thomaz-henrique', name: 'Thomaz Henrique', photo: '/candidates/thomaz-henrique.jpg', party: 'PL', office: 'Deputado estadual / SP', votes: 178164 },
-    { id: 'rodrigo-ashiuchi', name: 'Rodrigo Ashiuchi', photo: '/candidates/rodrigo-ashiuchi.jpg', party: 'PL', office: 'Deputado estadual / SP', votes: 162562 },
-    { id: 'marcos-damasio', name: 'Marcos Damásio', photo: '/candidates/marcos-damasio.jpg', party: 'PL', office: 'Deputado estadual / SP', votes: 156691 },
-    { id: 'dani-alonso', name: 'Dani Alonso', photo: '/candidates/dani-alonso.jpg', party: 'PL', office: 'Deputada estadual / SP', votes: 155574 },
-    { id: 'conte-lopes', name: 'Conte Lopes', photo: '/candidates/conte-lopes.jpg', party: 'PL', office: 'Deputado estadual / SP', votes: 139225 },
-    { id: 'felipe-sertanejo', name: 'Felipe Sertanejo', photo: '/candidates/felipe-sertanejo.jpg', party: 'PL', office: 'Deputado estadual / SP', votes: 138277 },
-    { id: 'delegada-graciela', name: 'Delegada Graciela', photo: '/candidates/delegada-graciela.jpg', party: 'PL', office: 'Deputada estadual / SP', votes: 125624 },
-    { id: 'alex-madureira', name: 'Alex Madureira', photo: '/candidates/alex-madureira.jpg', party: 'PL', office: 'Deputado estadual / SP', votes: 122704 },
-    { id: 'paulo-mansur', name: 'Paulo Mansur', photo: '/candidates/paulo-mansur.jpg', party: 'PL', office: 'Deputado estadual / SP', votes: 107073 },
-    { id: 'danilo-balas', name: 'Danilo Balas', photo: '/candidates/danilo-balas.jpg', party: 'PL', office: 'Deputado estadual / SP', votes: 96188 },
-    { id: 'leticia-aguiar', name: 'Letícia Aguiar', photo: '/candidates/leticia-aguiar.jpg', party: 'PL', office: 'Deputada estadual / SP', votes: 94832 },
-    { id: 'ricardo-madalena', name: 'Ricardo Madalena', photo: '/candidates/ricardo-madalena.jpg', party: 'PL', office: 'Deputado estadual / SP', votes: 94319 },
-    { id: 'lucas-bove', name: 'Lucas Bove', photo: '/candidates/lucas-bove.jpg', party: 'PL', office: 'Deputado estadual / SP', votes: 71263 },
-    { id: 'capitao-mosart', name: 'Capitão Mosart', photo: '/candidates/capitao-mosart.jpg', party: 'PL', office: 'Deputado estadual / SP', votes: 70997 },
-    { id: 'fabiana-bolsonaro', name: 'Fabiana Bolsonaro', photo: '/candidates/fabiana-bolsonaro.jpg', party: 'PL', office: 'Deputada estadual / SP', votes: 61183 },
-  ],
+function Link({ to, children, className = '', onClick, ...props }) {
+  return <a href={to} className={className} onClick={(event) => { onClick?.(event); if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigate(to) }} {...props}>{children}</a>
 }
 
-const initialScores = { left: 0, right: 0 }
-const initialGifts = { left: 0, right: 0 }
-const MATCH_DURATION = 5 * 60
-const localOverlay = ['localhost', '127.0.0.1'].includes(window.location.hostname)
-const autoConnectOnLoad = import.meta.env.VITE_AUTO_CONNECT === 'true'
-  || (localOverlay && import.meta.env.VITE_AUTO_CONNECT !== 'false')
-const autoPlayMusic = new URLSearchParams(window.location.search).get('audio') === '1'
+function Icon({ name, size = 23 }) {
+  const icons = { ticket: Ticket, truck: Truck, sparkles: Sparkles, gift: Gift, star: Star }
+  const Component = icons[name] || Gift
+  return <Component size={size} strokeWidth={1.65} aria-hidden="true" />
+}
 
-function randomMatchup(previous) {
-  let next
-  do {
-    next = {
-      left: CANDIDATES.left[Math.floor(Math.random() * CANDIDATES.left.length)].id,
-      right: CANDIDATES.right[Math.floor(Math.random() * CANDIDATES.right.length)].id,
+function Header({ route, count, setCookieOpen }) {
+  const [menuOpen, setMenuOpen] = useState(false)
+  return <header className="site-header"><div className="header-inner">
+    <Link to="/" className="wordmark" aria-label="Vitrine, início"><span className="brand-mark"><Sparkles size={19}/></span><span>vitrine<span className="brand-period">.</span></span></Link>
+    <nav className={menuOpen ? 'main-nav nav-open' : 'main-nav'} aria-label="Navegação principal">
+      {['/', '/cupons', '/faq'].map((path) => <Link key={path} to={path} className={route === path ? 'nav-link active' : 'nav-link'} onClick={() => setMenuOpen(false)}>{routeNames[path]}</Link>)}
+    </nav>
+    <div className="header-actions"><button className="icon-button cookie-shortcut" onClick={setCookieOpen} aria-label="Preferências de cookies"><Cookie size={19}/></button><Link to="/carrinho" className={route === '/carrinho' ? 'cart-link active' : 'cart-link'} aria-label={`Carrinho com ${count} itens`}><ShoppingBag size={19}/><span>Carrinho</span><b className="cart-count">{count}</b></Link><button className="icon-button mobile-menu" onClick={() => setMenuOpen((value) => !value)} aria-expanded={menuOpen} aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}>{menuOpen ? <X size={20}/> : <Menu size={20}/>}</button></div>
+  </div></header>
+}
+
+function ProductCard({ product, addToCart, inCart }) {
+  return <article className="product-card"><div className={`product-art art-${product.tone}`}><span className="product-badge">{product.badge}</span><div className="art-decoration art-circle-one"/><div className="art-decoration art-circle-two"/><span className="coupon-cut coupon-cut-left"/><span className="coupon-cut coupon-cut-right"/><div className="art-icon"><Icon name={product.icon} size={31}/></div><span className="art-code">VANTAGEM · {String(product.id.length * 7).padStart(2, '0')}</span></div><div className="product-info"><div className="product-category">CUPOM DE DEMONSTRAÇÃO</div><h3>{product.name}</h3><p>{product.detail}</p><div className="product-bottom"><div><strong>{formatPoints(product.points)}</strong><small>valor ilustrativo</small></div><button className={inCart ? 'add-button added' : 'add-button'} onClick={() => addToCart(product.id)} aria-label={`Adicionar ${product.name} ao carrinho`}>{inCart ? <><Check size={16}/> ADICIONADO</> : <><Plus size={17}/> ADICIONAR</>}</button></div></div></article>
+}
+
+function ProductGrid({ list, addToCart, cart }) { return <div className="product-grid">{list.map((product) => <ProductCard key={product.id} product={product} addToCart={addToCart} inCart={cart.some((item) => item.id === product.id)}/>)}</div> }
+
+function PromoHero({ active, setActive }) {
+  const promo = promos[active]
+  const PromoIcon = promo.icon
+  return <section className={`promo-hero ${promo.tone}`} aria-label="Promoções"><div className="promo-copy"><div className="eyebrow"><span className="eyebrow-star">✳</span>{promo.eyebrow}</div><h1>{promo.title}</h1><p>{promo.text}</p><Link to={promo.to} className="primary-button">{promo.cta}<ArrowRight size={17}/></Link><div className="promo-controls"><button onClick={() => setActive((active + promos.length - 1) % promos.length)} aria-label="Promoção anterior"><ArrowLeft size={17}/></button><div className="promo-dots" aria-label={`Promoção ${active + 1} de ${promos.length}`}>{promos.map((item, index) => <button key={item.title} onClick={() => setActive(index)} className={index === active ? 'promo-dot selected' : 'promo-dot'} aria-label={`Mostrar promoção ${index + 1}`}/>)}</div><button onClick={() => setActive((active + 1) % promos.length)} aria-label="Próxima promoção"><ArrowRight size={17}/></button></div></div><div className="promo-visual"><div className="visual-orbit orbit-one"/><div className="visual-orbit orbit-two"/><div className="visual-note note-one"><span>✳</span> boas escolhas</div><div className="visual-note note-two"><Heart size={15} fill="currentColor"/> feito para você</div><div className="promo-sticker"><PromoIcon size={40}/><span>DESCUBRA</span><strong>novas<br/>vantagens</strong><i>✳</i></div><div className="visual-sparkle sparkle-one">✦</div><div className="visual-sparkle sparkle-two">✳</div></div><div className="hero-side-note">VITRINE DE VANTAGENS <span>•</span> {String(active + 1).padStart(2, '0')} / 03</div></section>
+}
+
+function TrustStrip() { return <div className="trust-strip"><div><span className="trust-icon"><ShieldCheck size={18}/></span><span><b>ESCOLHA TRANQUILA</b><small>Revise antes de continuar</small></span></div><div><span className="trust-icon"><Ticket size={18}/></span><span><b>OFERTAS EM UM SÓ LUGAR</b><small>Encontre sua próxima vantagem</small></span></div><div><span className="trust-icon"><Heart size={18}/></span><span><b>FEITO PARA VOCÊ</b><small>Uma experiência simples e leve</small></span></div></div> }
+
+function HomePage({ addToCart, cart }) {
+  const [active, setActive] = useState(0)
+  useEffect(() => { const timer = window.setInterval(() => setActive((index) => (index + 1) % promos.length), 6500); return () => window.clearInterval(timer) }, [])
+  return <><PromoHero active={active} setActive={setActive}/><main className="page-shell home-content"><TrustStrip/><section className="section-block"><div className="section-heading"><div><span className="section-overline">VANTAGENS DA VITRINE</span><h2>Um bom achado muda o dia.</h2><p>Veja uma prévia dos cupons disponíveis.</p></div><Link to="/cupons" className="text-link">VER TODOS OS CUPONS <ArrowRight size={16}/></Link></div><ProductGrid list={products.slice(0, 3)} addToCart={addToCart} cart={cart}/></section><section className="callout"><div className="callout-icon"><Gift size={23}/></div><div><span>ESCOLHA, REVISE, CONTINUE</span><h2>Suas próximas vantagens esperam por você.</h2></div><Link to="/cupons" className="secondary-button">EXPLORAR CUPONS <ArrowRight size={16}/></Link></section></main></>
+}
+
+function PageHeading({ eyebrow, title, description, back = '/' }) { return <div className="page-heading"><Link to={back} className="back-link"><ArrowLeft size={15}/> VOLTAR</Link><span className="section-overline">{eyebrow}</span><h1>{title}</h1><p>{description}</p></div> }
+
+function CouponsPage({ addToCart, cart }) { return <main className="page-shell subpage"><PageHeading eyebrow="ESCOLHA A SUA PRÓXIMA VANTAGEM" title="Cupons para descobrir." description="Explore a vitrine e adicione ao carrinho os benefícios que chamarem sua atenção."/><div className="catalog-note"><Sparkles size={17}/><span><b>VITRINE DE EXEMPLO</b> Os cinco cupons e valores abaixo são demonstrativos e podem ser editados em <code>src/products.js</code>.</span></div><ProductGrid list={products} addToCart={addToCart} cart={cart}/><p className="demo-footnote">Os exemplos ainda não representam ofertas ou códigos de resgate ativos.</p></main> }
+
+function CartPage({ cart, setCart }) {
+  const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [form, setForm] = useState({ name: '', email: '' })
+  const [message, setMessage] = useState('')
+  const entries = cart.map((item) => ({ ...item, product: products.find((product) => product.id === item.id) })).filter((item) => item.product)
+  const subtotal = entries.reduce((sum, item) => sum + item.product.points * item.quantity, 0)
+  const setQuantity = (id, quantity) => setCart((items) => quantity < 1 ? items.filter((item) => item.id !== id) : items.map((item) => item.id === id ? { ...item, quantity: Math.min(quantity, 10) } : item))
+  const finishDemo = (event) => { event.preventDefault(); if (!entries.length) return; const reference = `VT-${Math.random().toString(36).slice(2, 8).toUpperCase()}`; setMessage(`Prévia concluída (${reference}). Nenhuma compra ou solicitação real foi enviada. Configure um serviço de pedidos e resgates para ativar esta etapa.`); setCart([]); setCheckoutOpen(false); setForm({ name: '', email: '' }) }
+  return <main className="page-shell subpage"><PageHeading eyebrow="SUA SELEÇÃO" title="Carrinho." description="Confira sua seleção antes de seguir." back="/cupons"/>{message && <div className="success-message" role="status"><Check size={19}/><span>{message}</span></div>}<div className="cart-layout"><section className="cart-items" aria-label="Itens no carrinho">{entries.length ? entries.map(({ id, quantity, product }) => <article className="cart-item" key={id}><div className={`cart-thumb art-${product.tone}`}><Icon name={product.icon} size={24}/></div><div className="cart-item-info"><span className="product-category">CUPOM DE DEMONSTRAÇÃO</span><h2>{product.name}</h2><p>{formatPoints(product.points)} por unidade</p></div><div className="quantity-control"><button aria-label={`Remover uma unidade de ${product.name}`} onClick={() => setQuantity(id, quantity - 1)}><Minus size={14}/></button><span>{quantity}</span><button aria-label={`Adicionar uma unidade de ${product.name}`} onClick={() => setQuantity(id, quantity + 1)} disabled={quantity >= 10}><Plus size={14}/></button></div><strong className="line-total">{formatPoints(product.points * quantity)}</strong><button className="remove-item" onClick={() => setQuantity(id, 0)} aria-label={`Remover ${product.name}`}><X size={17}/></button></article>) : <div className="empty-cart"><span className="empty-cart-icon"><ShoppingCart size={27}/></span><h2>Seu carrinho está vazio.</h2><p>Explore os cupons de demonstração e escolha os seus favoritos.</p><Link to="/cupons" className="primary-button">VER CUPONS <ArrowRight size={16}/></Link></div>}</section><aside className="order-summary"><span className="section-overline">RESUMO DA SELEÇÃO</span><h2>Seu pedido</h2><div className="summary-line"><span>Itens</span><span>{entries.reduce((sum, item) => sum + item.quantity, 0)}</span></div><div className="summary-line"><span>Total ilustrativo</span><b>{formatPoints(subtotal)}</b></div><div className="summary-rule"/><p>Esta vitrine é uma demonstração. Pontos não são cobrados e os cupons ainda não são resgatáveis.</p><button className="primary-button summary-continue" disabled={!entries.length} onClick={() => { setMessage(''); setCheckoutOpen(true) }}>CONTINUAR <ArrowRight size={16}/></button><Link to="/cupons" className="continue-shopping">Continuar escolhendo</Link></aside></div>{checkoutOpen && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setCheckoutOpen(false) }}><section className="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title"><button className="modal-close" onClick={() => setCheckoutOpen(false)} aria-label="Fechar"><X size={20}/></button><span className="section-overline">PRÉVIA DA FINALIZAÇÃO</span><h2 id="checkout-title">Quase lá.</h2><p>Confira como será a etapa de contato quando a loja estiver conectada ao serviço de pedidos.</p><form onSubmit={finishDemo}><label>Nome<input autoComplete="name" required maxLength={100} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Seu nome"/></label><label>Email<input autoComplete="email" required type="email" maxLength={254} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="voce@exemplo.com"/></label><div className="demo-disclaimer"><ShieldCheck size={18}/><span>Não haverá cobrança, envio de email nem resgate real. Os dados deste formulário são usados somente nesta prévia e não são salvos.</span></div><button className="primary-button" type="submit">VER PRÉVIA DO PEDIDO <ArrowRight size={16}/></button></form></section></div>}</main>
+}
+
+function FAQPage() {
+  const [form, setForm] = useState({ subject: '', message: '' })
+  const [notice, setNotice] = useState('')
+  const contact = import.meta.env.VITE_CONTACT_EMAIL || ''
+  const sendQuestion = (event) => {
+    event.preventDefault()
+    if (!contact) {
+      setNotice('O email de atendimento ainda não foi configurado. Defina VITE_CONTACT_EMAIL no ambiente do site para ativar o envio. A mensagem continua somente neste formulário.')
+      return
     }
-  } while (previous && next.left === previous.left && next.right === previous.right)
-  return next
-}
-
-function formatTime(total) {
-  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
-}
-
-function scoreFormat(score) {
-  return new Intl.NumberFormat('pt-BR').format(score)
-}
-
-function initials(name) {
-  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toLocaleUpperCase('pt-BR')
-}
-
-function ScoreNumber({ value }) {
-  return <AnimatePresence mode="popLayout" initial={false}><motion.span key={value} initial={{ y: 11, opacity: 0, scale: 0.94 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: -8, opacity: 0, scale: 1.02 }} transition={{ duration: 0.23, ease: 'easeOut' }}>{scoreFormat(value)}</motion.span></AnimatePresence>
-}
-
-function Panel({ children, className = '' }) {
-  return <div className={`panel ${className}`}>{children}</div>
-}
-
-function VotingMachine({ side, candidate, pressed }) {
-  const meta = SIDE_META[side]
-  const color = meta.color
-  const [lastPress, setLastPress] = useState(0)
-
-  useEffect(() => { if (pressed) setLastPress(Date.now()) }, [pressed])
-
-  return <div className="machine-visual" aria-hidden="true"><div className={`machine machine-${color} ${pressed ? 'machine-pressed' : ''}`}>
-    <div className="machine-top"><span className="machine-brand">VOTO LIVE · X1</span><span className="machine-indicator"><i /> LIGADA</span></div>
-    <div className="machine-screen-wrap">
-      <div className="machine-screen">
-        <div className="screen-head"><span>SEU VOTO PARA</span><strong>MELHOR MANDATO</strong></div>
-        <div className="screen-candidate"><div className="candidate-avatar">{initials(candidate.name)}</div><div><span>PARTIDO</span><strong>{candidate.party}</strong></div></div>
-        <div className="screen-person"><strong>{candidate.name}</strong><span>{candidate.office}</span></div>
-        <div className="screen-footer"><span>CONFIRME</span><span>◀ ANULAR</span></div>
-      </div>
-    </div>
-    <div className="machine-controls">
-      <div className="keypad" aria-hidden="true">{['1', '2', '3', '4', '5', '6', '7', '8', '9', 'BR', '0', 'COR'].map((key, index) => <span className={`key ${index > 8 ? 'key-light' : ''}`} key={key}>{key}</span>)}</div>
-      <div className="confirm-keys"><span className="key-cancel">ANULAR</span><span className="key-correct">CORRIGE</span><motion.span animate={pressed ? { scale: [1, 0.9, 1], boxShadow: ['0 3px 0 #17803d', '0 1px 0 #17803d', '0 3px 0 #17803d'] } : { scale: 1 }} className="key-confirm">CONFIRMA<ArrowRight size={9}/></motion.span></div>
-    </div>
-    <motion.div key={lastPress} className="machine-finger" initial={{ x: 0, y: 0, opacity: 0 }} animate={pressed ? { x: -35, y: -25, opacity: [0, 1, 1, 0] } : { opacity: 0 }} transition={{ duration: .52, times: [0, .2, .65, 1] }}>👆🏻</motion.div>
-    <div className="machine-base" />
-  </div></div>
-}
-
-function RoseFly({ side, username }) {
-  const color = SIDE_META[side].color
-  return <motion.div className={`rose-fly rose-${color}`} initial={{ opacity: 0, x: 0, y: 16, scale: .25, rotate: -25 }} animate={{ opacity: [0, 1, 1, 0], x: [0, 22, 82, 130], y: [16, -35, -42, -18], scale: [.3, 1.18, 1, .65], rotate: [-25, 5, 18, 32] }} exit={{ opacity: 0 }} transition={{ duration: 1.2, ease: 'easeOut' }}><span>🌹</span><small>{username || 'Rosa'}</small><Sparkles size={13}/></motion.div>
-}
-
-function SideCard({ side, candidate, score, percent, gifts, pressed, roseEvents }) {
-  const meta = SIDE_META[side]
-  const color = meta.color
-
-  return <Panel className={`candidate-card card-${color}`}>
-    <div className="card-glow" />
-    <div className="candidate-head">
-      <div className={`side-share share-${color}`}><span className="share-label">{meta.label}</span><strong>{percent}<small>%</small></strong></div>
-    </div>
-    <div className="card-divider" />
-    <div className="score-row"><div><span className="micro-label">VOTOS</span><div className={`score score-${color}`}><ScoreNumber value={score}/></div></div><div className="rose-total"><Gift size={18}/><b>{gifts}</b><span>🌹</span></div></div>
-    <div className="vote-progress"><div className={`progress-fill fill-${color}`} style={{ width: `${percent}%` }} /><span className={`progress-marker marker-dot-${color}`} style={{ left: `calc(${percent}% - 5px)` }} /></div>
-    <div className="machine-holder"><div className="machine-caption"><span>URNA {meta.label}</span><span className="machine-status"><i/> AO VIVO</span></div><div className="machine-stage"><div className="candidate-profile"><img src={candidate.photo} alt={`Foto oficial de ${candidate.name}, ${candidate.party}`} loading="eager"/><div className="candidate-description"><strong>{candidate.name}</strong><span className="candidate-party"><span />{candidate.party}</span><span className="candidate-office">{candidate.office}</span></div></div><VotingMachine side={side} candidate={candidate} pressed={pressed}/></div><AnimatePresence>{roseEvents.map((event) => <RoseFly key={event.id} side={side} username={event.username}/>)}</AnimatePresence></div>
-    <div className="card-footer"><span><Gift size={16}/>{gifts} ROSAS</span><span>1 ROSA = 1 VOTO</span></div>
-  </Panel>
-}
-
-function App() {
-  const [scores, setScores] = useState(initialScores)
-  const [gifts, setGifts] = useState(initialGifts)
-  const [matchup, setMatchup] = useState(() => randomMatchup())
-  const [round, setRound] = useState(1)
-  const [elapsed, setElapsed] = useState(MATCH_DURATION)
-  const [voteTotal, setVoteTotal] = useState(0)
-  const [pressedSide, setPressedSide] = useState(null)
-  const [roseEvents, setRoseEvents] = useState({ left: [], right: [] })
-  const [liveStatus, setLiveStatus] = useState(autoConnectOnLoad ? 'connecting' : 'disconnected')
-  const [events, setEvents] = useState([])
-  const [matchResult, setMatchResult] = useState(null)
-  const seq = useRef(0)
-  const resetTimer = useRef()
-  const sourceCleanups = useRef([])
-  const audioRef = useRef(null)
-  const roundSnapshotRef = useRef(null)
-
-  const candidatesBySide = useMemo(() => ({
-    left: CANDIDATES.left.find((candidate) => candidate.id === matchup.left),
-    right: CANDIDATES.right.find((candidate) => candidate.id === matchup.right),
-  }), [matchup])
-  const percentages = useMemo(() => {
-    const sum = scores.left + scores.right
-    if (!sum) return { left: 50, right: 50 }
-    return { left: Math.round((scores.left / sum) * 100), right: Math.round((scores.right / sum) * 100) }
-  }, [scores])
-  const difference = scores.left - scores.right
-  const leader = difference > 0 ? 'left' : difference < 0 ? 'right' : null
-  roundSnapshotRef.current = { scores, round, candidatesBySide }
-
-  const addVote = useCallback((side, quantity = 1, username = 'TikTok') => {
-    if (!SIDE_META[side]) return
-    const delta = getVoteDelta(quantity)
-    setScores((current) => ({ ...current, [side]: current[side] + delta.points }))
-    setGifts((current) => ({ ...current, [side]: current[side] + delta.roses }))
-    setVoteTotal((current) => current + delta.total)
-    setPressedSide(side)
-    window.clearTimeout(resetTimer.current)
-    resetTimer.current = window.setTimeout(() => setPressedSide((current) => current === side ? null : current), 720)
-    const id = ++seq.current
-    setRoseEvents((current) => ({ ...current, [side]: [...current[side], { id, username }].slice(-5) }))
-    setTimeout(() => setRoseEvents((current) => ({ ...current, [side]: current[side].filter((item) => item.id !== id) })), 1400)
-    setEvents((current) => [{ id, side, username, time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }, ...current].slice(0, 5))
-  }, [])
-
-  const resetScoreboard = () => {
-    setScores(initialScores); setGifts(initialGifts); setVoteTotal(0); setEvents([]); setRoseEvents({ left: [], right: [] }); setPressedSide(null)
+    const params = new URLSearchParams({ subject: form.subject || 'Dúvida sobre a Vitrine', body: form.message })
+    window.location.href = 'mailto:' + encodeURIComponent(contact) + '?' + params.toString()
   }
-
-  const startNextRound = useCallback(() => {
-    const { scores: finalScores, round: finalRound, candidatesBySide: finalCandidates } = roundSnapshotRef.current
-    const winnerSide = finalScores.left === finalScores.right ? null : finalScores.left > finalScores.right ? 'left' : 'right'
-    setMatchResult({ round: finalRound, winnerSide, winner: winnerSide ? finalCandidates[winnerSide] : null, scores: { ...finalScores } })
-    setMatchup((current) => randomMatchup(current))
-    resetScoreboard(); setElapsed(MATCH_DURATION); setRound((current) => current + 1)
-  }, [])
-
-  useEffect(() => {
-    if (elapsed <= 0) {
-      startNextRound()
-      return undefined
-    }
-    const timer = window.setTimeout(() => setElapsed((time) => Math.max(0, time - 1)), 1000)
-    return () => window.clearTimeout(timer)
-  }, [elapsed, startNextRound])
-
-  useEffect(() => {
-    if (!matchResult) return undefined
-    const timer = window.setTimeout(() => setMatchResult(null), 8000)
-    return () => window.clearTimeout(timer)
-  }, [matchResult])
-
-  useEffect(() => () => { window.clearTimeout(resetTimer.current); sourceCleanups.current.forEach((cleanup) => cleanup()) }, [])
-
-  useEffect(() => {
-    if (!autoConnectOnLoad) return undefined
-    const timer = window.setTimeout(() => {
-      const cleanup = connectLive((event) => addVote(event.side, event.quantity, event.username), setLiveStatus)
-      sourceCleanups.current.push(cleanup)
-    }, 0)
-    return () => window.clearTimeout(timer)
-  }, [addVote])
-
-  useEffect(() => {
-    if (!autoPlayMusic || !audioRef.current) return
-    audioRef.current.volume = 0.25
-    audioRef.current.play().catch(() => {})
-  }, [])
-
-  return <main className="app-shell">
-    <div className="ambient-glow glow-one"/><div className="ambient-glow glow-two"/>
-    <section className="match-info"><h1>A DECISÃO É SUA:<br/><span>QUEM FARÁ O MELHOR MANDATO?</span></h1><p>COMENTE <b className="instruction-left">ESQUERDA</b> OU <b className="instruction-right">DIREITA</b><br/>ENVIE 🌹 <b>1 ROSA = 1 VOTO</b></p></section>
-
-    <section className="scoreboard" aria-label="Placar do x1 de candidatos">
-      <Panel className="status-panel"><div className="timer-block"><span className="timer-label"><Clock3 size={12}/>PRÓXIMO X1</span><strong className={elapsed <= 30 ? 'timer-urgent' : ''}>{formatTime(elapsed)}</strong><span className="timer-hint">RODADA {round}</span></div><div className="status-divider"/><div className="status-metric"><span><Users size={13}/>VOTOS</span><strong><ScoreNumber value={voteTotal}/></strong><small>nesta rodada</small></div><div className="status-divider"/><div className="difference-metric"><span>{leader ? <ArrowDownRight size={14}/> : <Activity size={14}/>}DIFERENÇA</span><strong className={leader ? `diff-${SIDE_META[leader].color}` : ''}>{difference === 0 ? '—' : `${difference > 0 ? '+' : ''}${scoreFormat(difference)}`}</strong><small>{leader ? <>VANTAGEM <b>{SIDE_META[leader].label}</b></> : 'TUDO IGUAL'}</small></div><div className="status-live"><i/> RODADA {round}</div></Panel>
-      <div className="candidate-grid"><SideCard side="left" candidate={candidatesBySide.left} score={scores.left} percent={percentages.left} gifts={gifts.left} pressed={pressedSide === 'left'} roseEvents={roseEvents.left}/><div className="versus"><span>VS</span><div/><small>AO VIVO</small></div><SideCard side="right" candidate={candidatesBySide.right} score={scores.right} percent={percentages.right} gifts={gifts.right} pressed={pressedSide === 'right'} roseEvents={roseEvents.right}/></div>
-    </section>
-
-    <section className="activity-strip"><div className="activity-title"><span className="activity-icon"><Activity size={14}/></span><div><strong>ROSAS RECEBIDAS</strong><small>AO VIVO</small></div></div><div className="activity-items"><AnimatePresence initial={false}>{events.length ? events.slice(0, 3).map((event) => <motion.div key={event.id} className="activity-item" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -10 }}><span className={`event-avatar avatar-${SIDE_META[event.side].color}`}>{SIDE_META[event.side].initial}</span><span className="activity-user"><b>{event.username}</b><small>ENVIOU 🌹</small></span><span className={`event-vote vote-label-${SIDE_META[event.side].color}`}>+1 {SIDE_META[event.side].label}</span><span className="activity-time">{event.time}</span></motion.div>) : <span className="empty-activity">AGUARDANDO ROSAS</span>}</AnimatePresence></div><div className="activity-rules"><span><span className="rose-mini">🌹</span><b>CHAT + ROSA</b></span><small>1 ROSA = 1 VOTO</small></div></section>
-
-    <footer className="site-footer"><span>© 2026 VOTO LIVE <span className="footer-dot">·</span> FOTOS DE CANDIDATURAS · TSE 2026</span><span className="footer-powered"><span/><span>FEITO PARA A COMUNIDADE</span><Heart size={11}/></span></footer>
-
-      <audio ref={audioRef} src="/audio/funk-da-urna-2026.mp3" loop preload="auto" />
-
-      <AnimatePresence>{matchResult && <motion.div className="match-result-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}><motion.div className={`match-result-card ${matchResult.winnerSide ? `result-${SIDE_META[matchResult.winnerSide].color}` : 'result-tie'}`} initial={{ opacity: 0, y: 24, scale: .82 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12, scale: .94 }} transition={{ type: 'spring', damping: 18, stiffness: 220 }} role="status" aria-live="polite"><Sparkles size={23}/><span className="result-kicker">FIM DA RODADA {matchResult.round}</span><strong>{matchResult.winner ? `${matchResult.winner.name} venceu!` : 'Empate!'}</strong><span className="result-score">{scoreFormat(matchResult.scores.left)} × {scoreFormat(matchResult.scores.right)}</span><small>{matchResult.winner ? `VITÓRIA ${SIDE_META[matchResult.winnerSide].label}` : 'A PRÓXIMA DISPUTA COMEÇA AGORA'}</small></motion.div></motion.div>}</AnimatePresence>
-
-  </main>
+  return <main className="page-shell subpage"><PageHeading eyebrow="FALE COM A GENTE" title="Dúvidas?" description="Envie sua pergunta. O canal será ativado quando o email de atendimento for configurado."/><section className="faq-layout"><div className="faq-aside"><div className="faq-icon"><CircleHelp size={27}/></div><h2>Estamos preparando o atendimento.</h2><p>Deixe sua dúvida no formulário. Quando um email for configurado, ele abrirá sua ferramenta de email para você enviar a mensagem.</p><div className="faq-email-state"><Mail size={17}/><span>{contact || 'EMAIL DE ATENDIMENTO PENDENTE'}</span></div></div><form className="faq-form" onSubmit={sendQuestion}><label>Assunto<input maxLength={120} value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} placeholder="Sobre o que é sua dúvida?" required/></label><label>Sua mensagem<textarea maxLength={4000} rows={7} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="Escreva sua pergunta aqui…" required/></label><div className="form-bottom"><span>{form.message.length}/4000</span><button className="primary-button" type="submit">{contact ? 'ABRIR EMAIL' : 'PREPARAR ENVIO'} <ArrowRight size={16}/></button></div>{notice && <p className="inline-notice" role="status">{notice}</p>}<p className="form-privacy">{contact ? 'Seu aplicativo de email será aberto; a página não transmite nem armazena a mensagem.' : 'A mensagem permanece somente neste formulário enquanto o endereço de atendimento estiver pendente.'}</p></form></section></main>
 }
 
-export default App
+function CookiePreferences({ close }) {
+  const [analytics, setAnalytics] = useState(false)
+  const save = (allowAnalytics = analytics) => { try { localStorage.setItem(CONSENT_KEY, JSON.stringify({ essential: true, analytics: Boolean(allowAnalytics), savedAt: new Date().toISOString() })) } catch {} close() }
+  return <div className="modal-backdrop cookie-backdrop"><section className="cookie-modal" role="dialog" aria-modal="true" aria-labelledby="cookie-title"><div className="cookie-symbol"><Cookie size={23}/></div><span className="section-overline">SUA PRIVACIDADE</span><h2 id="cookie-title">Você escolhe como usamos cookies.</h2><p>Cookies essenciais mantêm o carrinho e suas preferências funcionando neste navegador. Nesta versão não usamos cookies de publicidade nem ferramentas de análise.</p><div className="cookie-option"><div><b>Essenciais</b><small>Necessários para o carrinho e a navegação.</small></div><span className="always-on"><Check size={14}/> SEMPRE ATIVOS</span></div><div className="cookie-option"><div><b>Análise</b><small>Preferência registrada; nenhuma ferramenta de análise está instalada.</small></div><button type="button" role="switch" aria-checked={analytics} className={analytics ? 'switch on' : 'switch'} onClick={() => setAnalytics((value) => !value)} aria-label="Ativar ou desativar cookies de análise"><span/></button></div><div className="cookie-links"><Link to="/privacidade" onClick={close}>Privacidade</Link><Link to="/cookies" onClick={close}>Cookies</Link><Link to="/diretrizes" onClick={close}>Diretrizes</Link></div><div className="cookie-actions"><button className="secondary-button" onClick={() => save()}>SALVAR ESCOLHAS</button><button className="primary-button" onClick={() => save(false)}>CONTINUAR COM ESSENCIAIS <ArrowRight size={15}/></button></div></section></div>
+}
+
+const legalContent = {
+  '/privacidade': { eyebrow: 'INFORMAÇÕES DO SITE', title: 'Privacidade.', description: 'Uma explicação simples sobre os dados usados nesta demonstração.', sections: [['O que guardamos', 'O carrinho e sua escolha de cookies podem ser salvos no armazenamento local do seu navegador. Não são enviados para um servidor nesta versão.'], ['Formulário de finalização', 'Os campos da prévia servem somente para demonstrar a experiência. Eles não são transmitidos nem mantidos após fechar a página.'], ['Atendimento por email', 'O formulário de dúvidas abre o aplicativo de email do visitante quando houver um endereço de atendimento configurado. Sem endereço, a página informa que o canal ainda está pendente.'], ['Responsável pelo site', 'Preencha aqui o nome ou razão social, o canal de contato e as informações do responsável antes da publicação comercial.']] },
+  '/cookies': { eyebrow: 'PREFERÊNCIAS DO NAVEGADOR', title: 'Política de cookies.', description: 'Quais informações ficam guardadas neste navegador.', sections: [['Essenciais', 'Usamos armazenamento local para manter o carrinho e registrar a preferência de cookies. Esses dados ficam neste navegador.'], ['Análise e publicidade', 'Esta cópia não inclui ferramentas de análise, pixels de anúncios ou cookies de publicidade. A opção de análise permanece desativada.'], ['Gerenciar ou apagar', 'Você pode apagar os dados do site nas configurações do navegador. Também pode reabrir as preferências pelo ícone de cookie no topo da página.']] },
+  '/diretrizes': { eyebrow: 'COMO USAR ESTA VITRINE', title: 'Diretrizes.', description: 'Informações para uma experiência clara e segura.', sections: [['Ofertas de exemplo', 'Os cinco itens, pontos e descrições desta versão são ilustrativos. Eles não garantem descontos, produtos, disponibilidade ou resgate.'], ['Compras e pagamentos', 'Não há cobrança, processamento de pagamento ou emissão de cupom habilitados nesta versão. A etapa de finalização é uma prévia local.'], ['Publicação comercial', 'Antes de iniciar vendas ou resgates, configure ofertas reais, regras, validade, atendimento, política de troca e o processamento seguro no servidor.']] },
+}
+
+function LegalPage({ route }) { const content = legalContent[route]; return <main className="page-shell subpage legal-page"><PageHeading eyebrow={content.eyebrow} title={content.title} description={content.description}/><div className="legal-card">{content.sections.map(([title, text]) => <section key={title}><span className="legal-icon"><ShieldCheck size={18}/></span><div><h2>{title}</h2><p>{text}</p></div></section>)}</div><Link to="/faq" className="text-link legal-help">Ficou com alguma dúvida? Fale com a gente <ArrowRight size={16}/></Link></main> }
+
+function Footer({ setCookieOpen }) { return <footer className="site-footer"><div className="footer-main"><div><Link to="/" className="wordmark"><span className="brand-mark"><Sparkles size={18}/></span><span>vitrine<span className="brand-period">.</span></span></Link><p>Uma experiência de demonstração para descobrir novas vantagens.</p></div><div className="footer-links"><div><b>EXPLORE</b><Link to="/cupons">Cupons</Link><Link to="/carrinho">Carrinho</Link><Link to="/faq">Dúvidas</Link></div><div><b>INFORMAÇÕES</b><Link to="/diretrizes">Diretrizes</Link><Link to="/privacidade">Privacidade</Link><Link to="/cookies">Cookies</Link><button onClick={setCookieOpen}>Preferências de cookies</button></div></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} VITRINE · DEMONSTRAÇÃO</span><span>OFERTAS E RESGATES AINDA NÃO ESTÃO ATIVOS</span></div></footer> }
+
+export default function App() {
+  const [route, setRoute] = useState(window.location.pathname.replace(/\/$/, '') || '/')
+  const [cart, setCart] = useState(readCart)
+  const [cookieOpen, setCookieOpen] = useState(() => safeRead(CONSENT_KEY, null)?.essential !== true)
+  const cartCount = useMemo(() => cart.reduce((sum, item) => sum + item.quantity, 0), [cart])
+  useEffect(() => { const update = () => setRoute(window.location.pathname.replace(/\/$/, '') || '/'); window.addEventListener('popstate', update); return () => window.removeEventListener('popstate', update) }, [])
+  useEffect(() => { try { localStorage.setItem(CART_KEY, JSON.stringify(cart)) } catch {} }, [cart])
+  useEffect(() => { if (cookieOpen) { const old = document.body.style.overflow; document.body.style.overflow = 'hidden'; const closeOnEscape = (event) => event.key === 'Escape' && setCookieOpen(false); window.addEventListener('keydown', closeOnEscape); return () => { document.body.style.overflow = old; window.removeEventListener('keydown', closeOnEscape) } } }, [cookieOpen])
+  const addToCart = (id) => setCart((items) => { const item = items.find((entry) => entry.id === id); return item ? items.map((entry) => entry.id === id ? { ...entry, quantity: Math.min(entry.quantity + 1, 10) } : entry) : [...items, { id, quantity: 1 }] })
+  const page = route === '/' ? <HomePage addToCart={addToCart} cart={cart}/> : route === '/cupons' ? <CouponsPage addToCart={addToCart} cart={cart}/> : route === '/carrinho' ? <CartPage cart={cart} setCart={setCart}/> : route === '/faq' ? <FAQPage/> : legalContent[route] ? <LegalPage route={route}/> : <main className="page-shell not-found"><span className="section-overline">404 · PÁGINA NÃO ENCONTRADA</span><h1>Este caminho não existe.</h1><Link to="/" className="primary-button">VOLTAR AO INÍCIO <Home size={16}/></Link></main>
+  useEffect(() => { document.title = `${routeNames[route] || 'Página não encontrada'} · Vitrine` }, [route])
+  return <><Header route={route} count={cartCount} setCookieOpen={() => setCookieOpen(true)}/>{page}<Footer setCookieOpen={() => setCookieOpen(true)}/>{cookieOpen && <CookiePreferences close={() => setCookieOpen(false)}/>}</>
+}
