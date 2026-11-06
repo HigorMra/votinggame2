@@ -3,11 +3,11 @@ import { ArrowLeft, ArrowRight, Check, CircleHelp, Cookie, Gift, Heart, Home, Ma
 import { products } from './products.js'
 
 const promos = [
-  { eyebrow: 'VANTAGENS FEITAS PARA VOCÊ', title: 'Seu próximo benefício começa aqui.', text: 'Explore ofertas de demonstração e monte sua seleção em poucos cliques.', cta: 'VER CUPONS', to: '/cupons', tone: 'promo-peach', icon: Gift },
-  { eyebrow: 'ESCOLHA COM CALMA', title: 'Uma vitrine de boas oportunidades.', text: 'Encontre um benefício que combine com o que você procura.', cta: 'EXPLORAR OFERTAS', to: '/cupons', tone: 'promo-blue', icon: Sparkles },
-  { eyebrow: 'RESGATE SIMPLES', title: 'Mais vantagens no seu ritmo.', text: 'Guarde seus cupons no carrinho e revise sua seleção quando quiser.', cta: 'ABRIR CARRINHO', to: '/carrinho', tone: 'promo-lilac', icon: Ticket },
+  { eyebrow: 'CAMPANHA DA TEMPORADA', title: 'Black Friday: ofertas em destaque.', text: 'Veja os itens cadastrados para a campanha.', cta: 'VER BLACK FRIDAY', to: '/black-friday', tone: 'promo-peach', icon: Gift },
+  { eyebrow: 'PRESENTES DE NATAL', title: 'Encontre uma ideia para presentear.', text: 'Explore a seleção de demonstração para a temporada de Natal.', cta: 'VER NATAL', to: '/natal', tone: 'promo-blue', icon: Sparkles },
+  { eyebrow: 'CUPONS E VANTAGENS', title: 'Uma vitrine para descobrir.', text: 'Explore cupons de exemplo e monte sua seleção em poucos cliques.', cta: 'VER CUPONS', to: '/cupons', tone: 'promo-lilac', icon: Ticket },
 ]
-const routeNames = { '/': 'Início', '/cupons': 'Cupons', '/carrinho': 'Carrinho', '/faq': 'Dúvidas', '/privacidade': 'Privacidade', '/cookies': 'Cookies', '/diretrizes': 'Diretrizes' }
+const routeNames = { '/': 'Início', '/natal': 'Natal', '/black-friday': 'Black Friday', '/cupons': 'Cupons', '/carrinho': 'Carrinho', '/faq': 'Dúvidas', '/privacidade': 'Privacidade', '/cookies': 'Cookies', '/diretrizes': 'Diretrizes' }
 const CART_KEY = 'vitrine-demo-cart-v1'
 const CONSENT_KEY = 'vitrine-cookie-preferences-v1'
 const safeRead = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback } catch { return fallback } }
@@ -45,6 +45,15 @@ function Header({ route, count, setCookieOpen }) {
   </div></header>
 }
 
+function CategorySidebar({ route }) {
+  const categories = [
+    { path: '/natal', label: 'Natal', icon: Gift },
+    { path: '/black-friday', label: 'Black Friday', icon: Sparkles },
+    { path: '/cupons', label: 'Cupons', icon: Ticket },
+  ]
+  return <aside className="category-sidebar"><span className="sidebar-kicker">LOJA</span><h2>Departamentos</h2><nav aria-label="Categorias de produtos">{categories.map(({ path, label, icon: CategoryIcon }) => <Link key={path} to={path} aria-current={route === path ? 'page' : undefined} className={route === path ? 'category-link selected' : 'category-link'}><CategoryIcon size={18}/><span>{label}</span><ArrowRight size={14} className="category-arrow"/></Link>)}</nav><div className="sidebar-note"><span>✳</span><div><b>OFERTAS DA TEMPORADA</b><small>Consulte a página para ver a seleção atual.</small></div></div></aside>
+}
+
 function ProductCard({ product, addToCart, inCart }) {
   return <article className="product-card"><div className={`product-art art-${product.tone}`}><span className="product-badge">{product.badge}</span><div className="art-decoration art-circle-one"/><div className="art-decoration art-circle-two"/><span className="coupon-cut coupon-cut-left"/><span className="coupon-cut coupon-cut-right"/><div className="art-icon"><Icon name={product.icon} size={31}/></div><span className="art-code">VANTAGEM · {String(product.id.length * 7).padStart(2, '0')}</span></div><div className="product-info"><div className="product-category">CUPOM DE DEMONSTRAÇÃO</div><h3>{product.name}</h3><p>{product.detail}</p><div className="product-bottom"><div><strong>{formatPoints(product.points)}</strong><small>valor ilustrativo</small></div><button className={inCart ? 'add-button added' : 'add-button'} onClick={() => addToCart(product.id)} aria-label={`Adicionar ${product.name} ao carrinho`}>{inCart ? <><Check size={16}/> ADICIONADO</> : <><Plus size={17}/> ADICIONAR</>}</button></div></div></article>
 }
@@ -61,13 +70,21 @@ function TrustStrip() { return <div className="trust-strip"><div><span className
 
 function HomePage({ addToCart, cart }) {
   const [active, setActive] = useState(0)
-  useEffect(() => { const timer = window.setInterval(() => setActive((index) => (index + 1) % promos.length), 6500); return () => window.clearInterval(timer) }, [])
-  return <><PromoHero active={active} setActive={setActive}/><main className="page-shell home-content"><TrustStrip/><section className="section-block"><div className="section-heading"><div><span className="section-overline">VANTAGENS DA VITRINE</span><h2>Um bom achado muda o dia.</h2><p>Veja uma prévia dos cupons disponíveis.</p></div><Link to="/cupons" className="text-link">VER TODOS OS CUPONS <ArrowRight size={16}/></Link></div><ProductGrid list={products.slice(0, 3)} addToCart={addToCart} cart={cart}/></section><section className="callout"><div className="callout-icon"><Gift size={23}/></div><div><span>ESCOLHA, REVISE, CONTINUE</span><h2>Suas próximas vantagens esperam por você.</h2></div><Link to="/cupons" className="secondary-button">EXPLORAR CUPONS <ArrowRight size={16}/></Link></section></main></>
+  useEffect(() => { const timer = window.setInterval(() => setActive((index) => (index + 1) % promos.length), 5000); return () => window.clearInterval(timer) }, [])
+  return <><PromoHero active={active} setActive={setActive}/><main className="page-shell home-content"><TrustStrip/><section className="section-block"><div className="section-heading"><div><span className="section-overline">OFERTAS EM DESTAQUE</span><h2>Uma seleção para descobrir.</h2><p>Veja uma prévia das ofertas cadastradas.</p></div><Link to="/black-friday" className="text-link">VER BLACK FRIDAY <ArrowRight size={16}/></Link></div><ProductGrid list={products.slice(0, 3)} addToCart={addToCart} cart={cart}/></section><section className="callout"><div className="callout-icon"><Gift size={23}/></div><div><span>ESCOLHA, REVISE, CONTINUE</span><h2>Encontre sua próxima vantagem.</h2></div><Link to="/cupons" className="secondary-button">EXPLORAR CUPONS <ArrowRight size={16}/></Link></section></main></>
 }
 
 function PageHeading({ eyebrow, title, description, back = '/' }) { return <div className="page-heading"><Link to={back} className="back-link"><ArrowLeft size={15}/> VOLTAR</Link><span className="section-overline">{eyebrow}</span><h1>{title}</h1><p>{description}</p></div> }
 
 function CouponsPage({ addToCart, cart }) { return <main className="page-shell subpage"><PageHeading eyebrow="ESCOLHA A SUA PRÓXIMA VANTAGEM" title="Cupons para descobrir." description="Explore a vitrine e adicione ao carrinho os benefícios que chamarem sua atenção."/><div className="catalog-note"><Sparkles size={17}/><span><b>VITRINE DE EXEMPLO</b> Os cinco cupons e valores abaixo são demonstrativos e podem ser editados em <code>src/products.js</code>.</span></div><ProductGrid list={products} addToCart={addToCart} cart={cart}/><p className="demo-footnote">Os exemplos ainda não representam ofertas ou códigos de resgate ativos.</p></main> }
+
+function CampaignPage({ campaign, addToCart, cart }) {
+  const isBlackFriday = campaign === 'black-friday'
+  const title = isBlackFriday ? 'Black Friday.' : 'Natal.'
+  const label = isBlackFriday ? 'BLACK FRIDAY' : 'NATAL'
+  const list = products.filter((product) => product.categories?.includes(campaign))
+  return <main className="page-shell subpage campaign-page"><PageHeading eyebrow={label} title={title} description={isBlackFriday ? 'Todos os produtos cadastrados nesta loja e marcados para a campanha Black Friday.' : 'Produtos cadastrados para a temporada de Natal.'}/><div className="campaign-banner"><span className="campaign-mark">✳</span><div><b>{isBlackFriday ? 'OFERTAS DE BLACK FRIDAY' : 'SELEÇÃO DE NATAL'}</b><p>Catálogo de demonstração · {list.length} {list.length === 1 ? 'produto' : 'produtos'} cadastrados</p></div><span className="campaign-tag">{isBlackFriday ? 'TEMPORADA 2026' : 'FESTAS 2026'}</span></div><ProductGrid list={list} addToCart={addToCart} cart={cart}/><p className="demo-footnote">Os itens, preços em pontos e descontos são exemplos ilustrativos. Configure produtos, preços reais e links da Kiwify antes de divulgar ou aceitar pedidos.</p></main>
+}
 
 function CartPage({ cart, setCart }) {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
@@ -121,7 +138,7 @@ export default function App() {
   useEffect(() => { try { localStorage.setItem(CART_KEY, JSON.stringify(cart)) } catch {} }, [cart])
   useEffect(() => { if (cookieOpen) { const old = document.body.style.overflow; document.body.style.overflow = 'hidden'; const closeOnEscape = (event) => event.key === 'Escape' && setCookieOpen(false); window.addEventListener('keydown', closeOnEscape); return () => { document.body.style.overflow = old; window.removeEventListener('keydown', closeOnEscape) } } }, [cookieOpen])
   const addToCart = (id) => setCart((items) => { const item = items.find((entry) => entry.id === id); return item ? items.map((entry) => entry.id === id ? { ...entry, quantity: Math.min(entry.quantity + 1, 10) } : entry) : [...items, { id, quantity: 1 }] })
-  const page = route === '/' ? <HomePage addToCart={addToCart} cart={cart}/> : route === '/cupons' ? <CouponsPage addToCart={addToCart} cart={cart}/> : route === '/carrinho' ? <CartPage cart={cart} setCart={setCart}/> : route === '/faq' ? <FAQPage/> : legalContent[route] ? <LegalPage route={route}/> : <main className="page-shell not-found"><span className="section-overline">404 · PÁGINA NÃO ENCONTRADA</span><h1>Este caminho não existe.</h1><Link to="/" className="primary-button">VOLTAR AO INÍCIO <Home size={16}/></Link></main>
+  const page = route === '/' ? <HomePage addToCart={addToCart} cart={cart}/> : route === '/black-friday' ? <CampaignPage campaign="black-friday" addToCart={addToCart} cart={cart}/> : route === '/natal' ? <CampaignPage campaign="natal" addToCart={addToCart} cart={cart}/> : route === '/cupons' ? <CouponsPage addToCart={addToCart} cart={cart}/> : route === '/carrinho' ? <CartPage cart={cart} setCart={setCart}/> : route === '/faq' ? <FAQPage/> : legalContent[route] ? <LegalPage route={route}/> : <main className="page-shell not-found"><span className="section-overline">404 · PÁGINA NÃO ENCONTRADA</span><h1>Este caminho não existe.</h1><Link to="/" className="primary-button">VOLTAR AO INÍCIO <Home size={16}/></Link></main>
   useEffect(() => { document.title = `${routeNames[route] || 'Página não encontrada'} · Vitrine` }, [route])
-  return <><Header route={route} count={cartCount} setCookieOpen={() => setCookieOpen(true)}/>{page}<Footer setCookieOpen={() => setCookieOpen(true)}/>{cookieOpen && <CookiePreferences close={() => setCookieOpen(false)}/>}</>
+  return <><Header route={route} count={cartCount} setCookieOpen={() => setCookieOpen(true)}/><div className="store-layout"><CategorySidebar route={route}/><div className="store-page">{page}</div></div><Footer setCookieOpen={() => setCookieOpen(true)}/>{cookieOpen && <CookiePreferences close={() => setCookieOpen(false)}/>}</>
 }
