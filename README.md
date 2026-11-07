@@ -1,15 +1,28 @@
-# Vitrine de Cupons
+# Vitrine de Natal 2026
 
-Landing responsiva de demonstração para uma loja de cupons e vantagens, em React e Vite.
+Landing page responsiva para catálogo de produtos, construída com React e Vite.
 
-## Páginas
+## Editar produtos e anúncios
 
-- Início com banner de promoções rotativas e seleção de cupons.
-- Catálogo com cinco exemplos editáveis em `src/products.js`.
-- Carrinho persistido apenas no armazenamento local do navegador.
-- Prévia de finalização de pedido, sem cobrança, envio de email ou resgate real.
-- Formulário de dúvidas que abre o aplicativo de email do visitante quando `VITE_CONTACT_EMAIL` está configurado.
-- Páginas de privacidade, cookies e diretrizes, com preferências de cookies.
+Os dados dos produtos ficam em `src/products.js`. Para editar um anúncio, altere o objeto correspondente nessa lista:
+
+- `name`, `detail` e `description`: título e textos exibidos no catálogo e na página de detalhes.
+- `image` e `images`: caminhos das fotos usadas no cartão e na galeria.
+- `specs`, `care`, `included`, `composition` e `notes`: informações detalhadas opcionais.
+- `price`: preço numérico em reais, ou `null` enquanto não definido.
+- `purchaseUrl`: link público do anúncio/checkout, vazio enquanto não definido.
+- `category` e `tags`: organização dos filtros e páginas.
+
+Coloque os arquivos de imagem em `public/products` e referencie-os, por exemplo, como `/products/arvore-frente.png`. Assim o catálogo não depende de URLs de imagem de terceiros.
+
+## Páginas e recursos
+
+- Home com campanha sazonal, navegação por categoria e catálogo em destaque.
+- Catálogo e páginas individuais de produto com galeria, descrição e especificações.
+- Favoritos e carrinho guardados localmente no navegador.
+- Página de carrinho informativa. Compra e pagamento só ficam ativos após configurar preço e integrar um checkout real.
+- Formulário de dúvidas que prepara um email quando `VITE_CONTACT_EMAIL` estiver configurado.
+- Páginas de privacidade, cookies e diretrizes.
 
 ## Rodar localmente
 
@@ -18,23 +31,21 @@ npm ci
 npm run dev
 ```
 
-O Vite mostra o endereço local no terminal. Para gerar a versão estática:
+Para gerar a versão estática:
 
 ```bash
 npm run build
 npm run preview
 ```
 
-## Configuração antes de operar uma loja
+## Antes de vender
 
-Os cinco cupons, nomes e valores são somente dados ilustrativos. Edite `src/products.js` com ofertas confirmadas. Configure `VITE_CONTACT_EMAIL` no ambiente da hospedagem para definir o destinatário do formulário de dúvidas.
+Confirme preço, estoque, composição, entrega, política de troca, identificação do vendedor e link de compra. A lista da cesta tem 16 linhas, incluindo caixa e filme plástico; confirme se são 14 itens mais 2 materiais de embalagem antes de publicar. A loja não processa pagamentos nesta versão.
 
-A finalização atual é apenas uma prévia de interface. Antes de receber pedidos reais, implemente um backend para validar preços e disponibilidade, registrar pedidos, autenticar clientes quando necessário e integrar um provedor de pagamento compatível. Nunca coloque chaves privadas, segredos ou credenciais em variáveis `VITE_*` ou no código do navegador.
-
-Revise também os textos de privacidade e diretrizes para incluir a identificação e os canais oficiais da pessoa ou empresa responsável. A política de cookies desta demonstração informa que o carrinho e as preferências ficam no navegador e não há analytics instalado.
+Configure `VITE_CONTACT_EMAIL` no ambiente da hospedagem se quiser abrir o aplicativo de email do visitante pelo formulário de dúvidas. Não coloque chaves privadas, segredos ou credenciais em variáveis `VITE_*` ou no código do navegador.
 
 ## Publicação no Netlify
 
-O repositório `HigorMra/votinggame2` está conectado ao GitHub. No Netlify, use esse repositório, diretório raiz `/`, comando `npm ci && npm run build` e diretório de publicação `dist`. O arquivo `netlify.toml` define o build, suporte a rotas de página e cabeçalhos de segurança.
+O repositório `HigorMra/votinggame2` pode ser conectado ao Netlify com diretório raiz `/`, comando `npm ci && npm run build` e diretório de publicação `dist`. O arquivo `netlify.toml` define o build, as rotas e cabeçalhos de segurança.
 
 Não adicione arquivos `.env` ou dados de clientes ao Git. O `.gitignore` exclui arquivos de ambiente, cache e artefatos de build.
