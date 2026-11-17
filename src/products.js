@@ -51,8 +51,8 @@ export const products = [
       { src: '/products/img.arvore3.png', alt: 'Detalhes dos galhos de PVC e da haste metálica' },
       { src: '/products/img.arvore4.png', alt: 'Árvore decorada em sala; enfeites não inclusos' },
     ],
-    price: 349.99,
-    oldPrice: null,
+    price: 359.99,
+    oldPrice: 559.99,
     purchaseUrl: '',
     specs: [
       ['Marca', 'DEKASA'], ['Material', 'Plástico e ferro'], ['Cor', 'Verde'],
@@ -83,7 +83,7 @@ export const products = [
       { src: '/products/img.kit2.png', alt: 'Imagem de composição dos itens da cesta' },
     ],
     price: 129.99,
-    oldPrice: null,
+    oldPrice: 199.99,
     purchaseUrl: '',
     composition: [
       '1 Amendoim Japonês 30g - Fritz',

@@ -47,5 +47,28 @@
 .voltage-choice select{min-height:40px;padding:0 10px;border:1px solid #51483d;border-radius:5px;background:#151311;color:#fff}
 .product-variants>small{color:#b9b0a3;font-size:11px}
 .cart-variant{display:block;margin-top:4px;color:#b9b0a3;font-size:11px}
+.hero-content{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(360px,.85fr);align-items:center;gap:clamp(24px,5vw,76px)}
+.hero-copy{min-width:0}
+.hero-copy h1{font-size:clamp(52px,6.5vw,86px)}
+.hero-offer-rotator{position:relative;z-index:3;width:100%;max-width:550px;justify-self:end}
+.hero-offer-card{min-height:340px;display:grid;grid-template-columns:.95fr 1fr;overflow:hidden;border:1px solid #e0bd7280;border-radius:10px;background:linear-gradient(145deg,#1b1712f5,#0b0a09f5);box-shadow:0 22px 65px #0009,inset 0 0 35px #edb9440c;transition:transform .25s,border-color .25s}
+.hero-offer-card:hover{transform:translateY(-4px);border-color:var(--gold-light)}
+.hero-offer-image{position:relative;min-height:340px;display:grid;place-items:center;overflow:hidden;background:#f7f5ef}
+.hero-offer-image img{width:100%;height:100%;position:absolute;inset:0;object-fit:contain}
+.hero-offer-image>span{position:absolute;top:13px;left:13px;padding:7px 9px;border-radius:3px;background:var(--red);color:white;font-size:8px;font-weight:900;letter-spacing:1px}
+.hero-offer-content{display:flex;align-items:flex-start;justify-content:center;flex-direction:column;padding:23px 20px}
+.hero-offer-content>small{color:var(--gold-light);font-size:9px;font-weight:850;letter-spacing:1.2px;text-transform:uppercase}
+.hero-offer-content h2{margin:10px 0 16px;color:#fff;font:clamp(24px,3vw,36px)/1.03 var(--title)}
+.hero-offer-content del{color:#aaa095;font-size:14px}
+.hero-offer-content>strong{margin-top:3px;color:#ffe09b;font:clamp(32px,4vw,47px)/1 var(--title)}
+.hero-offer-savings{margin-top:9px;color:#f58e83;font-size:10px;font-weight:900;letter-spacing:.5px}
+.hero-offer-cta{display:flex;align-items:center;gap:8px;margin-top:18px;padding:11px 13px;border-radius:4px;background:linear-gradient(100deg,#ad111f,#f02a38);color:white;font-size:9px;font-weight:900;letter-spacing:.8px}
+.hero-offer-pagination{display:flex;justify-content:center;gap:8px;margin-top:14px}
+.hero-offer-pagination button{width:25px;height:6px;padding:0;border:0;border-radius:5px;background:#928778;cursor:pointer}
+.hero-offer-pagination button.selected{width:40px;background:var(--gold-light)}
+.product-old-price{display:block;margin-top:13px;color:#aaa095;font-size:12px}
+.product-info .product-old-price+.sale-price{margin-top:2px}
+@media(max-width:900px){.hero-content{grid-template-columns:minmax(0,1fr) minmax(300px,.9fr);gap:22px}.hero-copy h1{font-size:clamp(50px,7vw,70px)}.hero-offer-card{min-height:290px}.hero-offer-image{min-height:290px}.hero-offer-content{padding:17px 14px}}
+@media(max-width:700px){.hero-content{grid-template-columns:1fr;gap:22px;padding:40px 0 60px}.hero-copy h1{font-size:clamp(48px,14vw,70px)}.hero-offer-rotator{max-width:none;justify-self:stretch}.hero-offer-card{grid-template-columns:.95fr 1fr;min-height:230px}.hero-offer-image{min-height:230px}.hero-offer-content h2{font-size:26px}.hero-offer-content>strong{font-size:34px}.hero-offer-content{padding:14px 12px}.hero-stamp{display:none}}
 .hero-pagination{display:flex;gap:6px;margin-top:16px}.hero-pagination button{width:17px;height:3px;padding:0;border:0;border-radius:4px;background:#776759;transition:width .2s,background .2s}.hero-pagination button.selected{width:32px;background:var(--gold-light)}.favorite-icon-wrap{position:relative;display:grid}.favorite-icon-wrap b{position:absolute;top:-7px;right:-8px;min-width:15px;height:15px;padding:0 3px;display:grid;place-items:center;border-radius:50%;background:#ae1723;color:#fff;font-size:8px}.contact-form{max-width:620px;margin-top:20px;padding:20px;display:grid;gap:14px;border:1px solid #3a3329;background:#121110}.contact-form label{display:grid;gap:7px;color:#d7c9ae;font-size:9px;font-weight:750}.contact-form input,.contact-form textarea{width:100%;padding:11px;border:1px solid #494036;border-radius:3px;background:#0c0b0a;color:#f5f2ed;font-size:10px}.contact-form textarea{resize:vertical;min-height:130px}.contact-form>small{color:#938a7f;font-size:8px}
 .header-actions .favorite-shortcut{display:flex}.favorite-shortcut>span:last-child{display:none}
