@@ -19,6 +19,7 @@ Coloque os arquivos de imagem em `public/products` e referencie-os, por exemplo,
 
 - Home com campanha sazonal, navegação por categoria e catálogo em destaque.
 - Catálogo e páginas individuais de produto com galeria, descrição e especificações.
+- Seletor de cor do pisca-pisca, variação 110 V e preço de R$ 24,99.
 - Favoritos e carrinho guardados localmente no navegador.
 - Página de carrinho informativa. Compra e pagamento só ficam ativos após configurar preço e integrar um checkout real.
 - Formulário de dúvidas que prepara um email quando `VITE_CONTACT_EMAIL` estiver configurado.

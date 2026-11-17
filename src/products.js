@@ -2,6 +2,42 @@
 // Mantenha as imagens em public/products para que não dependam de hospedagem externa.
 export const products = [
   {
+    id: 'pisca-pisca-100-led',
+    slug: 'pisca-pisca-natal-100-leds',
+    name: 'Pisca-pisca natalino 100 LEDs',
+    category: 'Iluminação Natalina',
+    detail: 'Cordão de luzes com 8 funções e opções de cor.',
+    description: 'Pisca-pisca de Natal com 100 lâmpadas LED e 8 funções ajustáveis. Fio transparente e opções de cor: branco quente, branco-frio e colorido. Comprimento informado: 11 metros. Voltagem: 110 V.\n\nTodos os piscas são testados antes do envio para que o comprador tenha o conforto de receber o produto em pleno funcionamento.\n\nProduto com disponibilidade imediata em nosso estoque. Após a confirmação da compra, o produto seguirá via Mercado Envios.',
+    image: '/products/pisca-colorido.png',
+    imageAlt: 'Pisca-pisca natalino com LEDs coloridos',
+    images: [
+      { src: '/products/pisca-colorido.png', alt: 'Pisca-pisca natalino com LEDs coloridos' },
+      { src: '/products/pisca-na-arvore.png', alt: 'Pisca-pisca colorido decorando uma árvore de Natal' },
+      { src: '/products/pisca-branco-frio.png', alt: 'Pisca-pisca com luz branca fria' },
+      { src: '/products/pisca-branco-quente.png', alt: 'Pisca-pisca com luz branca quente' },
+    ],
+    price: 24.99,
+    oldPrice: null,
+    purchaseUrl: '',
+    variants: {
+      colors: ['Branco Quente', 'Branco-frio', 'Colorido'],
+      voltage: '110 V',
+    },
+    specs: [
+      ['Lâmpadas LED', '100'], ['Funções', '8 ajustáveis'], ['Comprimento', '11 m'],
+      ['Cor do fio', 'Transparente'], ['Potência', '8 W'], ['Voltagem', '110 V'],
+      ['Resistência à água', 'Informada pelo vendedor'], ['Uso externo', 'Não recomendado'],
+      ['Composição', '20% metal e 80% plástico'], ['Quantidade', '1 peça'], ['Origem', 'Importado'],
+      ['Garantia do vendedor', '30 dias'],
+    ],
+    notes: [
+      'Não permitir o manuseio por crianças.',
+      'Apesar de o vendedor informar resistência à água, a descrição também não recomenda uso em ambiente externo. Siga as instruções do fabricante e proteja a conexão elétrica.',
+      'O vendedor informa teste do produto antes do envio e despacho via Mercado Envios após a confirmação da compra.',
+    ],
+    tags: ['natal', 'iluminacao', 'presentes'],
+  },
+  {
     id: 'arvore-natal-210',
     slug: 'arvore-de-natal-210-metros',
     name: 'Árvore de Natal 2,10 metros com 1.000 galhos',
@@ -15,7 +51,7 @@ export const products = [
       { src: '/products/img.arvore3.png', alt: 'Detalhes dos galhos de PVC e da haste metálica' },
       { src: '/products/img.arvore4.png', alt: 'Árvore decorada em sala; enfeites não inclusos' },
     ],
-    price: null,
+    price: 349.99,
     oldPrice: null,
     purchaseUrl: '',
     specs: [
@@ -46,7 +82,7 @@ export const products = [
       { src: '/products/img.kit1.png', alt: 'Cesta de Natal com alimentos, panettone e bebida' },
       { src: '/products/img.kit2.png', alt: 'Imagem de composição dos itens da cesta' },
     ],
-    price: null,
+    price: 129.99,
     oldPrice: null,
     purchaseUrl: '',
     composition: [

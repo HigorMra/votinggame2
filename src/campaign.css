@@ -36,5 +36,16 @@
 .product-facts ul{display:grid;gap:8px;padding-left:20px;color:#d2cbc1;line-height:1.6}
 .product-detail-copy .catalog-disclaimer{margin:10px 0 18px}
 @media(max-width:760px){.product-detail-layout{grid-template-columns:1fr;gap:24px}.product-detail-image{height:65vw;min-height:280px}.product-detail-copy h1{font-size:36px}}
+.product-variants{display:grid;gap:15px;margin:18px 0;padding:16px;border:1px solid var(--line);border-radius:6px;background:#ffffff06}
+.product-variants fieldset{margin:0;padding:0;border:0}
+.product-variants legend,.voltage-choice{margin-bottom:9px;color:#ddd5ca;font-size:13px}
+.product-variants legend b{color:var(--gold-light)}
+.variant-options{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.variant-options button{min-height:38px;padding:0 12px;border:1px solid #51483d;border-radius:5px;background:#151311;color:#eee7dc;font-size:12px}
+.variant-options button:hover,.variant-options button.selected{border-color:var(--gold);background:#3b2b16;color:#ffe3a6}
+.voltage-choice{display:grid;gap:8px;max-width:200px}
+.voltage-choice select{min-height:40px;padding:0 10px;border:1px solid #51483d;border-radius:5px;background:#151311;color:#fff}
+.product-variants>small{color:#b9b0a3;font-size:11px}
+.cart-variant{display:block;margin-top:4px;color:#b9b0a3;font-size:11px}
 .hero-pagination{display:flex;gap:6px;margin-top:16px}.hero-pagination button{width:17px;height:3px;padding:0;border:0;border-radius:4px;background:#776759;transition:width .2s,background .2s}.hero-pagination button.selected{width:32px;background:var(--gold-light)}.favorite-icon-wrap{position:relative;display:grid}.favorite-icon-wrap b{position:absolute;top:-7px;right:-8px;min-width:15px;height:15px;padding:0 3px;display:grid;place-items:center;border-radius:50%;background:#ae1723;color:#fff;font-size:8px}.contact-form{max-width:620px;margin-top:20px;padding:20px;display:grid;gap:14px;border:1px solid #3a3329;background:#121110}.contact-form label{display:grid;gap:7px;color:#d7c9ae;font-size:9px;font-weight:750}.contact-form input,.contact-form textarea{width:100%;padding:11px;border:1px solid #494036;border-radius:3px;background:#0c0b0a;color:#f5f2ed;font-size:10px}.contact-form textarea{resize:vertical;min-height:130px}.contact-form>small{color:#938a7f;font-size:8px}
 .header-actions .favorite-shortcut{display:flex}.favorite-shortcut>span:last-child{display:none}
