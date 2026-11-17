@@ -84,7 +84,7 @@ export const products = [
     category: 'Árvores de Natal',
     detail: 'Árvore verde com estrutura de metal e espaço para seus enfeites.',
     description: 'A Árvore de Natal de 2,10 metros com 1000 galhos é perfeita para quem deseja uma decoração imponente e cheia de encanto. Com altura ideal para se destacar em salas amplas, lojas ou escritórios, ela combina presença marcante com praticidade na montagem. Seus 1000 galhos bem distribuídos proporcionam um visual cheio e natural, garantindo espaço suficiente para enfeites, luzes e laços que deixam a decoração ainda mais especial. Uma escolha versátil e elegante para transformar qualquer ambiente em um cenário natalino acolhedor e inesquecível.',
-    image: '/products/img.arvore1.png',
+    image: '/products/img.arvore1-cutout.png',
     imageAlt: 'Árvore de Natal verde com base metálica',
     images: [
       { src: '/products/img.arvore1.png', alt: 'Árvore de Natal verde com base metálica' },
