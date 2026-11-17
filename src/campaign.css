@@ -38,6 +38,8 @@
 @media(max-width:760px){.product-detail-layout{grid-template-columns:1fr;gap:24px}.product-detail-image{height:65vw;min-height:280px}.product-detail-copy h1{font-size:36px}}
 .product-variants{display:grid;gap:15px;margin:18px 0;padding:16px;border:1px solid var(--line);border-radius:6px;background:#ffffff06}
 .product-variants fieldset{margin:0;padding:0;border:0}
+.model-select{display:grid;gap:8px;color:#ddd5ca;font-size:13px}
+.model-select select{width:100%;min-height:43px;padding:0 10px;border:1px solid #51483d;border-radius:5px;background:#151311;color:#fff}
 .product-variants legend,.voltage-choice{margin-bottom:9px;color:#ddd5ca;font-size:13px}
 .product-variants legend b{color:var(--gold-light)}
 .variant-options{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}

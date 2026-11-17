@@ -2,6 +2,46 @@
 // Mantenha as imagens em public/products para que não dependam de hospedagem externa.
 export const products = [
   {
+    id: 'kit-bolas-natal-luvinco',
+    slug: 'kit-30-bolas-natal-6cm-luvinco',
+    name: 'Kit com 30 bolas de Natal de 6 cm decoradas para árvore',
+    category: 'Bolas de Natal',
+    detail: 'Kit LuvinCo com 30 enfeites penduráveis; escolha entre oito modelos.',
+    description: 'O anúncio refere-se a 1 (um) kit com 30 bolas de Natal decoradas de 6 cm, no modelo escolhido na compra.\n\nDeixe sua decoração natalina mais bonita e completa com o Kit de Bolas de Natal LuvinCo. Cada conjunto combina cores, desenhos e acabamentos variados, como superfícies brilhantes, foscas, texturizadas e com glitter, conforme o modelo selecionado. Com 6 cm de diâmetro, as bolas são ideais para decorar árvores de Natal, guirlandas, arranjos e outros espaços festivos. As diferentes combinações permitem criar desde uma decoração clássica em vermelho e dourado até composições com branco e verde.\n\nO conteúdo é de 1 kit com 30 bolas de Natal decoradas de 6 cm, no modelo selecionado.',
+    image: '/products/kit-30-bolas-natal.png',
+    imageAlt: 'Kit de bolas de Natal decoradas em várias cores para enfeitar a árvore',
+    images: [
+      { src: '/products/kit-30-bolas-natal.png', alt: 'Kit com 30 bolas de Natal decoradas; imagem ilustrativa dos modelos' },
+    ],
+    price: 88.90,
+    oldPrice: 139.99,
+    purchaseUrl: '',
+    variants: {
+      models: [
+        'Modelo 1 · Vermelho / Dourado / Flocos',
+        'Modelo 2 · Vermelho / Dourado / Espiral',
+        'Modelo 3 · Vermelho / Branco / Poá',
+        'Modelo 4 · Vermelho / Verde / Branco / Círculos',
+        'Modelo 5 · Dourado / Branco / Estrelas',
+        'Modelo 6 · Vermelho / Dourado / Flores',
+        'Modelo 7 · Vermelho / Verde / Branco / Estrelas',
+        'Modelo 8 · Vermelho / Verde / Branco / Zig-Zag',
+      ],
+    },
+    specs: [
+      ['Marca', 'LuvinCo'], ['Produto', 'Kit de bolas de Natal decoradas'],
+      ['Diâmetro', '6 cm cada bola'], ['Dimensões informadas', '6 × 6 × 6 cm'],
+      ['Quantidade', '30 enfeites por kit'], ['Cores', 'Vermelho, verde, branco e variações conforme o modelo'],
+      ['Peso informado', '100 g'], ['Material', 'Plástico'], ['Forma', 'Redonda'],
+      ['Pendurável', 'Sim'], ['Formato de venda', 'Pack'],
+    ],
+    notes: [
+      'O kit contém o modelo selecionado na compra; as cores e estampas variam conforme a opção.',
+      'Uso decorativo em árvores de Natal, guirlandas e arranjos natalinos.',
+    ],
+    tags: ['natal', 'decoracao', 'bolas', 'presentes'],
+  },
+  {
     id: 'pisca-pisca-100-led',
     slug: 'pisca-pisca-natal-100-leds',
     name: 'Pisca-pisca natalino 100 LEDs',
